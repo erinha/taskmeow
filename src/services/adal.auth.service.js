@@ -4,20 +4,18 @@ import AuthenticationContext from "adal-angular/lib/adal";
 // an AAD account. This leverages the AAD v1 endpoint.
 class AdalAuthService {
   constructor() {
-    const scopes = encodeURIComponent(
-      "email openid profile offline_access User.Read"
-    );
+    const scopes = encodeURIComponent("email openid profile offline_access User.Read");
 
     this.applicationConfig = {
-      clientId: "36b1586d-b1da-45d2-9b32-899c3757b6f8",
+      clientId: "ab93102c-869b-4d34-a921-a31d3e7f76ef",
       endpoints: {
-        api: "36b1586d-b1da-45d2-9b32-899c3757b6f8"
+        api: "ab93102c-869b-4d34-a921-a31d3e7f76ef",
       },
       extraQueryParameter: `prompt=consent&scope=${scopes}`,
       redirectUri: `${window.location.origin}/callback/v1`,
       cacheLocation: "localStorage",
       callback: this.loginCallback,
-      popUp: !window.navigator.standalone
+      popUp: !window.navigator.standalone,
     };
 
     this.authContext = new AuthenticationContext(this.applicationConfig);
@@ -27,8 +25,8 @@ class AdalAuthService {
     if (this.loginPromise) {
       if (!error) {
         this.getUser()
-          .then(user => this.loginPromiseResolve(user))
-          .catch(error => {
+          .then((user) => this.loginPromiseResolve(user))
+          .catch((error) => {
             this.loginPromiseReject(error);
             this.loginPromise = undefined;
           });
@@ -75,16 +73,13 @@ class AdalAuthService {
 
   getToken() {
     return new Promise((resolve, reject) => {
-      this.authContext.acquireToken(
-        this.applicationConfig.endpoints.api,
-        (reason, token, error) => {
-          if (!error) {
-            resolve(token);
-          } else {
-            reject({ error, reason });
-          }
+      this.authContext.acquireToken(this.applicationConfig.endpoints.api, (reason, token, error) => {
+        if (!error) {
+          resolve(token);
+        } else {
+          reject({ error, reason });
         }
-      );
+      });
     });
   }
 }

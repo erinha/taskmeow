@@ -19,13 +19,13 @@ class TeamsAuthService {
     // Configure ADAL
     this.applicationConfig = {
       tenant: tenantId,
-      clientId: "36b1586d-b1da-45d2-9b32-899c3757b6f8",
+      clientId: "ab93102c-869b-4d34-a921-a31d3e7f76ef",
       endpoints: {
-        api: "36b1586d-b1da-45d2-9b32-899c3757b6f8"
+        api: "ab93102c-869b-4d34-a921-a31d3e7f76ef",
       },
       redirectUri: `${window.location.origin}/tab/silent-end`,
       cacheLocation: "localStorage",
-      navigateToLoginRequestUrl: false
+      navigateToLoginRequestUrl: false,
     };
 
     this.authContext = new AuthenticationContext(this.applicationConfig);
@@ -44,12 +44,12 @@ class TeamsAuthService {
             url: `${window.location.origin}/tab/silent-start`,
             width: 600,
             height: 535,
-            successCallback: result => {
+            successCallback: (result) => {
               resolve(this.getUser());
             },
-            failureCallback: reason => {
+            failureCallback: (reason) => {
               reject(reason);
-            }
+            },
           });
         });
       });
@@ -76,34 +76,27 @@ class TeamsAuthService {
   getToken() {
     return new Promise((resolve, reject) => {
       this.ensureLoginHint().then(() => {
-        this.authContext.acquireToken(
-          this.applicationConfig.endpoints.api,
-          (reason, token, error) => {
-            if (!error) {
-              resolve(token);
-            } else {
-              reject({ error, reason });
-            }
+        this.authContext.acquireToken(this.applicationConfig.endpoints.api, (reason, token, error) => {
+          if (!error) {
+            resolve(token);
+          } else {
+            reject({ error, reason });
           }
-        );
+        });
       });
     });
   }
 
   ensureLoginHint() {
     return new Promise((resolve, reject) => {
-      microsoftTeams.getContext(context => {
-        const scopes = encodeURIComponent(
-          "email openid profile offline_access User.Read"
-        );
+      microsoftTeams.getContext((context) => {
+        const scopes = encodeURIComponent("email openid profile offline_access User.Read");
 
         // Setup extra query parameters for ADAL
         // - openid and profile scope adds profile information to the id_token
         // - login_hint provides the expected user name
         if (context.loginHint) {
-          this.authContext.config.extraQueryParameter = `prompt=consent&scope=${scopes}&login_hint=${encodeURIComponent(
-            context.loginHint
-          )}`;
+          this.authContext.config.extraQueryParameter = `prompt=consent&scope=${scopes}&login_hint=${encodeURIComponent(context.loginHint)}`;
         } else {
           this.authContext.config.extraQueryParameter = `prompt=consent&scope=${scopes}`;
         }
